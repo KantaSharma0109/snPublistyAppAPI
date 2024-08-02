@@ -32,13 +32,12 @@ $query = "
         locations.category_id, 
         locations.location_name, 
         locations.city_id, 
-        locations.start_date, 
-        locations.end_date, 
         locations.status, 
         locations.created_at, 
         locations.updated_at, 
         locations.featured, 
         city.city_name,
+        category.categoryname,
         (SELECT img_upload.img 
          FROM img_upload 
          WHERE img_upload.location_id = locations.id 
@@ -47,6 +46,8 @@ $query = "
         locations 
     INNER JOIN 
         city ON locations.city_id = city.id
+        INNER JOIN 
+        category ON locations.category_id = category.id
     WHERE 
         locations.featured = 1";
 

@@ -7,7 +7,7 @@ include("dbconnection.php");
 $category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
 
 if ($category_id > 0) {
-    $query = "SELECT locations.id, locations.category_id, locations.location_name, locations.city_id, locations.start_date, locations.end_date, locations.status, locations.created_at, locations.updated_at, locations.featured, city.city_name
+    $query = "SELECT locations.id, locations.category_id, locations.location_name, locations.city_id, locations.status, locations.available_status, locations.created_at, locations.updated_at, locations.featured, city.city_name
     FROM locations 
     INNER JOIN city ON locations.city_id = city.id 
     WHERE locations.category_id = $category_id AND locations.status = '1'";
@@ -28,6 +28,21 @@ if ($category_id > 0) {
                 }
             }
 
+            // Add available_status and end date if available_status is 0
+            if ($row['available_status'] == 0) {
+                $endDateQuery = "SELECT end_date FROM quotation WHERE location_id = $location_id AND category_id = {$row['category_id']} AND city_id = {$row['city_id']}";
+                $endDateResult = $conn->query($endDateQuery);
+
+                if ($endDateResult->num_rows > 0) {
+                    $endDateRow = $endDateResult->fetch_assoc();
+                    $row['end_date'] = $endDateRow['end_date'];
+                } else {
+                    $row['end_date'] = null;
+                }
+            } else {
+                $row['end_date'] = null;
+            }
+
             $row['location_images'] = $images;
             $locations[] = $row;
         }
@@ -40,6 +55,8 @@ if ($category_id > 0) {
 }
 
 $conn->close();
+
+
 
 
 
